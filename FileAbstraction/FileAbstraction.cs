@@ -2,11 +2,7 @@
 {
     public static class ExtentionMethods
     {
-        /// <summary>
-        /// Year, Month, Day, Time
-        /// </summary>
-        /// <param name="dateTime"></param>
-        /// <returns></returns>
+        // Year, Month, Day, Time
         public static string Ymdt(this DateTime dateTime)
         {
             return DateTime.Now.ToString("yyyyMMdd HH-mm-ss-fff");
