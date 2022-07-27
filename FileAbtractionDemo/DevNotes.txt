@@ -1,4 +1,11 @@
 ﻿Search dirs for file when no path is given. But only search user folder, and start with current dir.
 It will take too long to search all the system dirs, and the file is probably not there.
 
-Add checks for file and path sizes. Maybe use registry settings and check the OS.
+Add checks for file and path sizes, 
+validate characters 
+and infer weather a file name or path has been passed (check for "\").
+Maybe use registry settings and check the OS. THe OS may determine the filename, path sizes, as well as dir character: "\" or "/"
+
+Add other types of file operations, eg bin files
+
+Possible disaplay warning if disk space is low.
