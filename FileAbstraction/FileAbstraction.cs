@@ -2,11 +2,6 @@
 {
     public static class ExtensionMethods
     {
-        // Year, Month, Day, Time
-        public static string Ymdt(this DateTime dateTime)
-        {
-            return DateTime.Now.ToString("yyyyMMdd HH-mm-ss-fff");
-        }
         public static bool ToTextFile<T>(this T o)
         {
             var dt = new DateTime();
@@ -15,28 +10,49 @@
         }
         public static bool ToTextFile<T>(this T o, string fileName)
         {
-            if (fileName.Length > Validation.MaxFileNameLength) { fileName = fileName.Substring(Validation.MaxFileNameLength - 1, fileName.Length - 1); }  //Trim file if too long, avoiding file system error
-
-            var fileContents = o is null ? "" : o.ToString();
-            if (fileName.Contains(Validation.SlashChar))
+            if (Validation.IsWindows() && (fileName.IndexOfAny(Validation.InvalidWindowsChars) != -1))
             {
+                foreach (char c in fileName)
+                {
+                    if (Validation.InvalidWindowsChars.Contains(c)) { fileName.Remove(c); }
+                }
+            }
+            var fileContents = o is null ? "" : o.ToString();
+            if (Validation.IsDirectory(fileName))
+            {
+                var slashIndexes = Enumerable.Range(0, fileName.Length)
+                                            .Where(x => x == Validation.SlashChar)
+                                            .ToList();
+                while (fileName.Length > Validation.MaxDirectoryLength) //Go one dir shallower, untill size is valid
+                {
+                    var lastSlashIndex = slashIndexes[slashIndexes.Count - 1];
+                    var secondLastSlashIndex = slashIndexes[slashIndexes.Count - 2];
+                    fileName = fileName.Substring(0, secondLastSlashIndex) + fileName.Substring(lastSlashIndex + 1, fileName.Length - 1);
+                }
                 File.WriteAllText(@$"{fileName}.txt", fileContents);
             }
             else
             {
+                if (fileName.Length > Validation.MaxFileNameLength) { fileName = fileName.Substring(Validation.MaxFileNameLength - 1, fileName.Length - 1); }  //Trim file if too long, avoiding file system error
                 File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + @$"{Validation.SlashChar}{fileName}.txt", fileContents);
             }
             return true;
         }
+        // Year, Month, Day, Time
+        private static string Ymdt(this DateTime dateTime)
+        {
+            return DateTime.Now.ToString("yyyyMMdd HH-mm-ss-fff");
+        }
     }
     internal class Validation
     {
+        public static bool IsDirectory(string s) => s.Contains(SlashChar);
         public static int MaxFileNameLength => IsWindows() ? ((IsLongPathsEnabled()) ? 32767 : 255) : 255;
+        public static int MaxDirectoryLength => IsLinux() ? 4096 : 260;
         public static char SlashChar => IsWindows() ? '\\' : '/';
-        private static bool IsWindows()
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? true : false;
-        }
+        public static char[] InvalidWindowsChars => new char[] { '<', '>', ':', '"', '/', '\\', '|', '?', '*' };
+        public static bool IsWindows() => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        public static bool IsLinux() => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
         private static bool IsLongPathsEnabled()
         {
