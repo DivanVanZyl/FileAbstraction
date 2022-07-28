@@ -4,7 +4,7 @@
     {
         public static void Main()
         {
-            //"Divan van Zyl".ToTextFile();
+            "This is some text that I wrote to a file!".ToTextFile();
             FileAbstraction.DisplayFile();
         }
 
