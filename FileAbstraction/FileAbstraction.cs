@@ -1,5 +1,18 @@
 ﻿namespace FileAbstraction
 {
+    public static class FileAbstraction
+    {
+        public static string ReadFile()
+        {
+            //Get all files in dir
+            string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
+            //Read latest one
+            var latest = files.Max(x => File.GetLastWriteTime(x));
+            var fileName = files.Where(x => (File.GetLastWriteTime(x) == latest)).Single();
+            return File.ReadAllText(fileName);
+        }
+        public static void DisplayFile() => Console.WriteLine(ReadFile());
+    }
     public static class ExtensionMethods
     {
         public static bool ToTextFile<T>(this T o)
@@ -37,7 +50,7 @@
                 File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + @$"{Validation.SlashChar}{fileName}.txt", fileContents);
             }
             return true;
-        }
+        }        
         // Year, Month, Day, Time
         private static string Ymdt(this DateTime dateTime)
         {

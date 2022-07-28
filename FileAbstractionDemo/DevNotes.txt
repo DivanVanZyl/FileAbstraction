@@ -4,4 +4,6 @@ It will take too long to search all the system dirs, and the file is probably no
 
 Writing
 Add other types of file operations, eg bin files
-Possible disaplay warning if disk space is low.
+Possibly disaplay warning if disk space is low.
+
+Refactor to infer file type.
