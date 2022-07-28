@@ -1,6 +1,6 @@
 ﻿namespace FileAbstraction
 {
-    public static class ExtentionMethods
+    public static class ExtensionMethods
     {
         // Year, Month, Day, Time
         public static string Ymdt(this DateTime dateTime)
@@ -37,6 +37,7 @@
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? true : false;
         }
+
         private static bool IsLongPathsEnabled()
         {
             var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem");
