@@ -6,4 +6,6 @@ Writing
 Add other types of file operations, eg bin files
 Possibly disaplay warning if disk space is low.
 
-Refactor to infer file type.
+General
+Refactor to infer file type: txt, binary etc.
+Move type validations to constructors in new classes to represent those types: FileName, FilePath
