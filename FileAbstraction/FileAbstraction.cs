@@ -15,10 +15,21 @@
     }
     public static class ExtensionMethods
     {
-        public static bool ToTextFile<T>(this T o)
+        public static bool ToFile<T>(this T o)
         {
-            var dt = new DateTime();
-            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + @$"{Validation.SlashChar}Default {dt.Ymdt()}.txt", o is null ? "" : o.ToString());
+            var fileName = AppDomain.CurrentDomain.BaseDirectory + @$"{Validation.SlashChar}{Environment.UserName}";
+
+            if (o is not null)
+            {
+                if (o.GetType() == typeof(string))
+                {
+                    File.WriteAllText(fileName + ".txt", o.ToString());
+                }
+                else
+                {
+                    File.WriteAllBytes(fileName, Data.ObjectToByteArray(o));
+                }
+            }
             return true;
         }
         public static bool ToTextFile<T>(this T o, string fileName)
@@ -50,11 +61,6 @@
                 File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + @$"{Validation.SlashChar}{fileName}.txt", fileContents);
             }
             return true;
-        }        
-        // Year, Month, Day, Time
-        private static string Ymdt(this DateTime dateTime)
-        {
-            return DateTime.Now.ToString("yyyyMMdd HH-mm-ss-fff");
         }
     }
     internal class Validation
@@ -82,6 +88,33 @@
             }
 
             return (int)regVal > 0;
+        }
+    }
+    internal class Data
+    {
+        public static byte[] ObjectToByteArray(object o)
+        {
+            if (o == null)
+                return new byte[] {};
+
+            return Encoding.UTF8.GetBytes(JsonSerializer.Serialize(o, GetJsonSerializerOptions()));
+        }
+        public static T? ByteArrayToObject<T>(byte[] byteArray)
+        {
+            if (byteArray == null || !byteArray.Any())
+                return default;
+
+            return JsonSerializer.Deserialize<T>(byteArray, GetJsonSerializerOptions());
+        }
+        private static JsonSerializerOptions GetJsonSerializerOptions()
+        {
+            return new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = null,
+                WriteIndented = true,
+                AllowTrailingCommas = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
         }
     }
 }
