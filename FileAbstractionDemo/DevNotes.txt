@@ -3,9 +3,7 @@ Search dirs for file when no path is given. But only search user folder, and sta
 It will take too long to search all the system dirs, and the file is probably not there.
 
 Writing
-Add other types of file operations, eg bin files
 Possibly disaplay warning if disk space is low.
 
 General
-Refactor to infer file type: txt, binary etc.
-Move type validations to constructors in new classes to represent those types: FileName, FilePath
+Refactor: Move validation logic from API to data types.
