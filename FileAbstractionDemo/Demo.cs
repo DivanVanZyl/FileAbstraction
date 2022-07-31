@@ -4,7 +4,7 @@
     {
         public static void Main()
         {
-            //Simple peration with easy syntax. This can be done with any object.
+            //Simple operation with easy syntax. This can be done with any object.
             4096.ToFile();
             FileAbstraction.DisplayFile();
 
