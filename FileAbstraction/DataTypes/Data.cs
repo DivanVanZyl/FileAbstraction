@@ -44,7 +44,7 @@ namespace FileAbstraction
 
             if(filePath.Length > Validation.MaxDirectoryLength)
             {
-                FileName name = new FileName(Path.GetFileName(filePath).Substring(0,Validation.MaxDirectoryLength - Path.GetDirectoryName(filePath).Length));
+                FileName name = new FileName(Path.GetFileName(filePath).Substring(0,Validation.MaxDirectoryLength));
                 var dir = Path.GetDirectoryName(filePath);
                 _fileName = dir + Validation.SlashChar + name.FileName;
             }
@@ -85,15 +85,8 @@ namespace FileAbstraction
             if (o == null)
                 return new byte[] { };
 
-            return Encoding.UTF8.GetBytes(JsonSerializer.Serialize(o, GetJsonSerializerOptions()));
-        }
-        public static T? ByteArrayToObject<T>(byte[] byteArray)
-        {
-            if (byteArray == null || !byteArray.Any())
-                return default;
-
-            return JsonSerializer.Deserialize<T>(byteArray, GetJsonSerializerOptions());
-        }
+            return Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(o, GetJsonSerializerOptions()));
+        }        
         private static JsonSerializerOptions GetJsonSerializerOptions()
         {
             return new JsonSerializerOptions()

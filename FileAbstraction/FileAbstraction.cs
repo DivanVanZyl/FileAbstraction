@@ -5,6 +5,24 @@
     /// </summary>
     public static class FileAbstraction
     {
+        public static T ReadBinFile<T>() where T : new()
+        {
+            var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
+            var latestFile = allFiles.Max(x => File.GetLastWriteTime(x));
+            var path = new FilePath(allFiles.Where(x => (File.GetLastWriteTime(x) == latestFile)).Single());
+
+            try
+            {
+                TextReader reader = new StreamReader(path.FileName);
+                var fileContents = reader.ReadToEnd();
+                var payload = JsonConvert.DeserializeObject<T>(fileContents);
+                return payload is null ? new T() : payload;
+            }
+            catch
+            {
+                return new T();
+            }                
+        }
         public static string ReadFile()
         {
             var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
