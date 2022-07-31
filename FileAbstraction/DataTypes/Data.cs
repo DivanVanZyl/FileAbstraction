@@ -5,7 +5,78 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileAbstraction
-{
+{    
+    abstract internal class DirectoryItem
+    {
+        public string FileName => _fileName is null ? "" : _fileName;
+        protected string? _fileName;
+        protected string CorrectedFileName(string fileName)
+        {
+            if (Validation.IsWindows() && (fileName.IndexOfAny(Validation.InvalidWindowsChars) != -1))
+            {
+                foreach (char c in fileName)
+                {
+                    if (Validation.InvalidWindowsChars.Contains(c)) { fileName.Replace(c.ToString(), ""); }
+                }
+            }
+            return fileName;
+        }
+        protected string TrimmedFileName(string fileName)
+        {
+            return fileName.Length > Validation.MaxFileNameLength ? fileName.Substring((fileName.Length - 1) - Validation.MaxFileNameLength, Validation.MaxFileNameLength) : fileName;  //Trim file if too long, avoiding file system error
+        }        
+    }
+    internal class FileName : DirectoryItem
+    {
+        public FileName(string name)
+        {
+            name = Validation.IsDirectory(name) ? Path.GetFileName(name) : name;
+            name = CorrectedFileName(name);
+            name = TrimmedFileName(name);
+            _fileName = name;
+        }
+    }
+    internal class FilePath : DirectoryItem
+    {
+        public FilePath(string filePath)
+        {
+            filePath = CorrectedFileName(filePath);
+            var slashIndexes = Enumerable.Range(0, filePath.Length)
+                                            .Where(x => x == Validation.SlashChar)
+                                            .ToList();
+            while (filePath.Length > Validation.MaxDirectoryLength) //Go one dir shallower, untill size is valid
+            {
+                var lastSlashIndex = slashIndexes[slashIndexes.Count - 1];
+                var secondLastSlashIndex = slashIndexes[slashIndexes.Count - 2];
+                filePath = filePath.Substring(0, secondLastSlashIndex) + filePath.Substring(lastSlashIndex + 1, (filePath.Length - 1) - (lastSlashIndex + 1));
+            }
+            _fileName = filePath;
+        }
+    }
+    internal class FileObject : DirectoryItem
+    {
+        private string _fileExtensionText;
+        private FileType _type;
+        public FileObject(string fileName)
+        {
+            _fileName = fileName;
+            if(fileName.Length > 3)
+            {
+                _type = fileName.Substring(fileName.Length - 4, 4) == ".txt" ? FileType.text : FileType.binary;
+            }
+            else
+            {
+                _type = FileType.binary;
+            }
+            _fileExtensionText = fileName.Contains('.') ? fileName.Substring(fileName.LastIndexOf('.')) : "";
+        }
+        public FileType Type => _type;
+    }
+    enum FileType
+    {
+        text,
+        binary
+    }
     internal static class DataOperationExensions
     {
         public static byte[] ObjectToByteArray<T>(this T o)
@@ -32,49 +103,79 @@ namespace FileAbstraction
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
         }
-    }
-    abstract internal class DirectoryItem
-    {
-        protected string? _fileName;
-        protected string CorrectedFileName(string fileName)
+        internal static string SearchRead(this DirectoryItem directoryItem, bool deepSearch = false)
         {
+            var fileName = Validation.IsDirectory(directoryItem.FileName)
+                ? directoryItem.FileName.Substring(directoryItem.FileName.LastIndexOf(Validation.SlashChar) + 1, (directoryItem.FileName.Length - 1) - (directoryItem.FileName.LastIndexOf(Validation.SlashChar) + 1))
+                : directoryItem.FileName;
 
-            if (Validation.IsWindows() && (fileName.IndexOfAny(Validation.InvalidWindowsChars) != -1))
+            var startDir = Directory.GetCurrentDirectory();
+
+            //Search deeper
+            var subDirectories = Directory.GetDirectories(startDir, "*", SearchOption.AllDirectories);
+
+            foreach (var subDirectory in subDirectories)
             {
-                foreach (char c in fileName)
+                foreach (var filePath in Directory.GetFiles(subDirectory))
                 {
-                    if (Validation.InvalidWindowsChars.Contains(c)) { fileName.Replace(c.ToString(),""); }
+                    var name = new FileName(filePath);
+                    if (name.FileName == fileName) return File.ReadAllText(filePath);
                 }
             }
-            return fileName;
-        }
 
-        public string FileName => _fileName is null ? "" : _fileName;
-    }
-    internal class FileName : DirectoryItem
-    {        
-        public FileName(string name)
-        {
-            name = CorrectedFileName(name);
-            if (name.Length > Validation.MaxFileNameLength) { name = name.Substring(Validation.MaxFileNameLength - 1, name.Length - 1); }  //Trim file if too long, avoiding file system error
-            _fileName = name;
-        }
-    }
-    internal class FilePath : DirectoryItem
-    {
-        public FilePath(string filePath)
-        {
-            filePath = CorrectedFileName(filePath);
-            var slashIndexes = Enumerable.Range(0, filePath.Length)
-                                            .Where(x => x == Validation.SlashChar)
-                                            .ToList();
-            while (filePath.Length > Validation.MaxDirectoryLength) //Go one dir shallower, untill size is valid
+            var drives = DriveInfo.GetDrives();
+            var thisDrive = drives.Where(x => x.Name == startDir.Substring(0, 3)).Single();
+
+            //Search back
+            var currentDir = startDir;
+            do
             {
-                var lastSlashIndex = slashIndexes[slashIndexes.Count - 1];
-                var secondLastSlashIndex = slashIndexes[slashIndexes.Count - 2];
-                filePath = filePath.Substring(0, secondLastSlashIndex) + filePath.Substring(lastSlashIndex + 1, filePath.Length - 1);
+                currentDir = Path.GetFullPath(Path.Combine(currentDir, ".."));
+                foreach (var filePath in Directory.GetFiles(currentDir))
+                {
+                    var name = new FileName(filePath);
+                    if (name.FileName == fileName) return File.ReadAllText(filePath);
+                }
+
+            } while (currentDir != thisDrive.Name);
+
+
+            //Search all drives
+            if (deepSearch)
+            {
+                foreach (var drive in drives)
+                {
+                    subDirectories = Directory.GetDirectories(drive.Name, "*", SearchOption.AllDirectories);
+                    foreach (var subDirectory in subDirectories)
+                    {
+                        foreach (var filePath in Directory.GetFiles(subDirectory))
+                        {
+                            var name = new FileName(filePath);
+                            if (name.FileName == fileName) return File.ReadAllText(filePath);
+                        }
+                    }
+                }
             }
-            _fileName = filePath;
+            else
+            {
+                //Skip system folders, only search user folders
+                foreach (var drive in drives)
+                {
+                    subDirectories = Directory.GetDirectories(drive.Name, "*", SearchOption.AllDirectories);
+                    var subDirectoryList = new List<string>(subDirectories);
+                    subDirectoryList.RemoveAll(x => x.StartsWith(thisDrive.Name + "Windows"));    //Remove all system folders here
+                    foreach (var subDirectory in subDirectories)
+                    {
+                        foreach (var filePath in Directory.GetFiles(subDirectory))
+                        {
+                            var name = new FileName(filePath);
+                            if (name.FileName == fileName) return File.ReadAllText(filePath);
+                        }
+                    }
+                }
+            }
+            return "";  //Not found
         }
     }
+
 }

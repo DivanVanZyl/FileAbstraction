@@ -14,6 +14,7 @@
             8192.ToFile(@"..\Bas3 tw0 numb3r5.txt");
 
             FileAbstraction.DisplayFile();
+            FileAbstraction.DisplayFile("Bas3 tw0 numb3r5.txt");
         }
     }
     internal class Computer
