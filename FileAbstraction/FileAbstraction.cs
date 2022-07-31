@@ -54,7 +54,14 @@
                 {
                     if (path.FileName.Contains(".txt"))
                     {
-                        File.WriteAllText(path.FileName, o.ToString());
+                        try
+                        {
+                            File.WriteAllText(path.FileName, o.ToString());
+                        }
+                        catch(DirectoryNotFoundException)
+                        {
+                            File.WriteAllText(Directory.GetCurrentDirectory() + Validation.SlashChar + Path.GetFileName(path.FileName), o.ToString());
+                        }
                     }
                     else
                     {

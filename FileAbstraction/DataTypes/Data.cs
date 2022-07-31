@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileAbstraction
-{    
+{
     abstract internal class DirectoryItem
     {
         public string FileName => _fileName is null ? "" : _fileName;
@@ -24,7 +24,7 @@ namespace FileAbstraction
         protected string TrimmedFileName(string fileName)
         {
             return fileName.Length > Validation.MaxFileNameLength ? fileName.Substring((fileName.Length - 1) - Validation.MaxFileNameLength, Validation.MaxFileNameLength) : fileName;  //Trim file if too long, avoiding file system error
-        }        
+        }
     }
     internal class FileName : DirectoryItem
     {
@@ -60,7 +60,7 @@ namespace FileAbstraction
         public FileObject(string fileName)
         {
             _fileName = fileName;
-            if(fileName.Length > 3)
+            if (fileName.Length > 3)
             {
                 _type = fileName.Substring(fileName.Length - 4, 4) == ".txt" ? FileType.text : FileType.binary;
             }
@@ -103,7 +103,7 @@ namespace FileAbstraction
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
         }
-        internal static string SearchRead(this DirectoryItem directoryItem, bool deepSearch = false)
+        internal static string SearchRead(this DirectoryItem directoryItem)
         {
             var fileName = Validation.IsDirectory(directoryItem.FileName)
                 ? directoryItem.FileName.Substring(directoryItem.FileName.LastIndexOf(Validation.SlashChar) + 1, (directoryItem.FileName.Length - 1) - (directoryItem.FileName.LastIndexOf(Validation.SlashChar) + 1))
@@ -141,40 +141,53 @@ namespace FileAbstraction
 
 
             //Search all drives
-            if (deepSearch)
+            foreach (var drive in drives)
             {
-                foreach (var drive in drives)
+                if (drive.IsReady)
                 {
-                    subDirectories = Directory.GetDirectories(drive.Name, "*", SearchOption.AllDirectories);
-                    foreach (var subDirectory in subDirectories)
+                    var resultOnDrive = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName);
+                    if (resultOnDrive.Length > 0)
+                        return resultOnDrive;
+                }                
+            }
+            return "";  //File not found
+        }
+        private static string WalkDirectoryTree(System.IO.DirectoryInfo root, string fileName)
+        {
+            System.IO.FileInfo[] files = null;
+            System.IO.DirectoryInfo[] subDirs = null;
+
+            // First, process all the files directly under this folder
+            try
+            {
+                files = root.GetFiles("*.*");
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+
+            catch (System.IO.DirectoryNotFoundException)
+            {
+            }
+
+            if (files != null)
+            {
+                foreach (System.IO.FileInfo fi in files)
+                {
+                    if (fi.Name == fileName) return File.ReadAllText(fi.FullName);
+                }
+
+                subDirs = root.GetDirectories();
+                foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+                {
+                    // Resursive call for each subdirectory.
+                    if(! (dirInfo.Name == "Windows" || dirInfo.Name == "Program Files(x86)" || dirInfo.Name == "Program Files"))    //Skip system folders, they are large and the user file is probably not here.
                     {
-                        foreach (var filePath in Directory.GetFiles(subDirectory))
-                        {
-                            var name = new FileName(filePath);
-                            if (name.FileName == fileName) return File.ReadAllText(filePath);
-                        }
+                        WalkDirectoryTree(dirInfo, fileName);                        
                     }
                 }
             }
-            else
-            {
-                //Skip system folders, only search user folders
-                foreach (var drive in drives)
-                {
-                    subDirectories = Directory.GetDirectories(drive.Name, "*", SearchOption.AllDirectories);
-                    var subDirectoryList = new List<string>(subDirectories);
-                    subDirectoryList.RemoveAll(x => x.StartsWith(thisDrive.Name + "Windows"));    //Remove all system folders here
-                    foreach (var subDirectory in subDirectories)
-                    {
-                        foreach (var filePath in Directory.GetFiles(subDirectory))
-                        {
-                            var name = new FileName(filePath);
-                            if (name.FileName == fileName) return File.ReadAllText(filePath);
-                        }
-                    }
-                }
-            }
-            return "";  //Not found
+            return "";
         }
     }
 
