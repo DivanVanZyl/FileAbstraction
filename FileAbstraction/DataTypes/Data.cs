@@ -41,16 +41,17 @@ namespace FileAbstraction
         public FilePath(string filePath)
         {
             filePath = CorrectedFileName(filePath);
-            var slashIndexes = Enumerable.Range(0, filePath.Length)
-                                            .Where(x => x == Validation.SlashChar)
-                                            .ToList();
-            while (filePath.Length > Validation.MaxDirectoryLength) //Go one dir shallower, untill size is valid
+
+            if(filePath.Length > Validation.MaxDirectoryLength)
             {
-                var lastSlashIndex = slashIndexes[slashIndexes.Count - 1];
-                var secondLastSlashIndex = slashIndexes[slashIndexes.Count - 2];
-                filePath = filePath.Substring(0, secondLastSlashIndex) + filePath.Substring(lastSlashIndex + 1, (filePath.Length - 1) - (lastSlashIndex + 1));
+                FileName name = new FileName(Path.GetFileName(filePath).Substring(0,Validation.MaxDirectoryLength - Path.GetDirectoryName(filePath).Length));
+                var dir = Path.GetDirectoryName(filePath);
+                _fileName = dir + Validation.SlashChar + name.FileName;
             }
-            _fileName = filePath;
+            else
+            {
+                _fileName = filePath;
+            }            
         }
     }
     internal class FileObject : DirectoryItem
@@ -148,7 +149,7 @@ namespace FileAbstraction
                     var resultOnDrive = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName);
                     if (resultOnDrive.Length > 0)
                         return resultOnDrive;
-                }                
+                }
             }
             return "";  //File not found
         }
@@ -181,9 +182,9 @@ namespace FileAbstraction
                 foreach (System.IO.DirectoryInfo dirInfo in subDirs)
                 {
                     // Resursive call for each subdirectory.
-                    if(! (dirInfo.Name == "Windows" || dirInfo.Name == "Program Files(x86)" || dirInfo.Name == "Program Files"))    //Skip system folders, they are large and the user file is probably not here.
+                    if (!(dirInfo.Name == "Windows" || dirInfo.Name == "Program Files(x86)" || dirInfo.Name == "Program Files"))    //Skip system folders, they are large and the user file is probably not here.
                     {
-                        WalkDirectoryTree(dirInfo, fileName);                        
+                        WalkDirectoryTree(dirInfo, fileName);
                     }
                 }
             }

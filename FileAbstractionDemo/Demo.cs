@@ -18,6 +18,11 @@
 
             "You found me too!".ToFile(@"C:\And I hide here.txt");
             FileAbstraction.DisplayFile("And I hide here.txt");
+
+            var c = new Computer();
+            c.ToFile();
+            var savedC = FileAbstraction.ReadFile();
+            Console.WriteLine(savedC.);
         }
     }
     internal class Computer
