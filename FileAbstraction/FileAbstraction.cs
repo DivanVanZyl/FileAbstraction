@@ -8,26 +8,30 @@
         public static T ReadBinFile<T>() where T : new()
         {
             var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
-            var latestFile = allFiles.Max(x => File.GetLastWriteTime(x));
-            var path = new FilePath(allFiles.Where(x => (File.GetLastWriteTime(x) == latestFile)).Single());
+            var latestFile = allFiles.Max(File.GetLastWriteTime);
+            var path = new FilePath(allFiles.Single(x => (File.GetLastWriteTime(x) == latestFile)));
 
             try
             {
-                TextReader reader = new StreamReader(path.FileName);
-                var fileContents = reader.ReadToEnd();
+                string fileContents;
+                using (TextReader reader = new StreamReader(path.FileName))
+                {
+                    fileContents = reader.ReadToEnd();
+                }
+
                 var payload = JsonConvert.DeserializeObject<T>(fileContents);
-                return payload is null ? new T() : payload;
+                return payload ?? new T();
             }
             catch
             {
                 return new T();
-            }                
+            }
         }
         public static string ReadFile()
         {
             var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
-            var latestFile = allFiles.Max(x => File.GetLastWriteTime(x));
-            var fileName = allFiles.Where(x => (File.GetLastWriteTime(x) == latestFile)).Single();
+            var latestFile = allFiles.Max(File.GetLastWriteTime);
+            var fileName = allFiles.Single(x => (File.GetLastWriteTime(x) == latestFile));
 
             var file = new FileObject(fileName);
             return File.ReadAllText(file.FileName);
@@ -66,35 +70,32 @@
     {
         private static void WriteToFile<T>(T o, FilePath path)
         {
-            if (o is not null)
+            if (o is string)
             {
-                if (o.GetType() == typeof(string))
+                if (path.FileName.Contains(".txt"))
                 {
-                    if (path.FileName.Contains(".txt"))
+                    try
                     {
-                        try
-                        {
-                            File.WriteAllText(path.FileName, o.ToString());
-                        }
-                        catch(DirectoryNotFoundException)
-                        {
-                            File.WriteAllText(Directory.GetCurrentDirectory() + Validation.SlashChar + Path.GetFileName(path.FileName), o.ToString());
-                        }
+                        File.WriteAllText(path.FileName, o.ToString());
                     }
-                    else
+                    catch (DirectoryNotFoundException)
                     {
-                        File.WriteAllText(path.FileName + ".txt", o.ToString());
+                        File.WriteAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + Path.GetFileName(path.FileName), o.ToString());
                     }
                 }
                 else
                 {
-                    File.WriteAllBytes(path.FileName, o.ObjectToByteArray());
+                    File.WriteAllText(path.FileName + ".txt", o.ToString());
                 }
+            }
+            else
+            {
+                File.WriteAllBytes(path.FileName, o.ObjectToByteArray());
             }
         }
         public static void ToFile<T>(this T o)
         {
-            FilePath filePath = new FilePath(AppDomain.CurrentDomain.BaseDirectory + @$"{Validation.SlashChar}{Environment.UserName}");
+            FilePath filePath = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{Path.DirectorySeparatorChar}{Environment.UserName}");
             WriteToFile(o, filePath);
 
         }
@@ -108,7 +109,7 @@
             else
             {
                 var fileName = new FileName(input);
-                var path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + @$"{fileName.FileName}");
+                var path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{fileName.FileName}");
                 WriteToFile(o, path);
             }
         }

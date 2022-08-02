@@ -8,15 +8,15 @@ namespace FileAbstraction
 {
     abstract internal class DirectoryItem
     {
-        public string FileName => _fileName is null ? "" : _fileName;
+        public string FileName =>  _fileName ?? "";
         protected string? _fileName;
         protected string CorrectedFileName(string fileName)
         {
-            if (Validation.IsWindows() && (fileName.IndexOfAny(Validation.InvalidWindowsChars) != -1))
+            if (Validation.IsWindows && (fileName.IndexOfAny(Validation.InvalidWindowsChars) != -1))
             {
-                foreach (char c in fileName)
+                foreach (var c in Validation.InvalidWindowsChars.Where(c => fileName.Contains(c)))
                 {
-                    if (Validation.InvalidWindowsChars.Contains(c)) { fileName.Replace(c.ToString(), ""); }
+                    fileName = fileName.Replace(c.ToString(), string.Empty);
                 }
             }
             return fileName;
@@ -46,7 +46,7 @@ namespace FileAbstraction
             {
                 FileName name = new FileName(Path.GetFileName(filePath).Substring(0,Validation.MaxDirectoryLength));
                 var dir = Path.GetDirectoryName(filePath);
-                _fileName = dir + Validation.SlashChar + name.FileName;
+                _fileName = dir + Path.DirectorySeparatorChar + name.FileName;
             }
             else
             {
@@ -57,33 +57,35 @@ namespace FileAbstraction
     internal class FileObject : DirectoryItem
     {
         private string _fileExtensionText;
-        private FileType _type;
         public FileObject(string fileName)
         {
             _fileName = fileName;
             if (fileName.Length > 3)
             {
-                _type = fileName.Substring(fileName.Length - 4, 4) == ".txt" ? FileType.text : FileType.binary;
+                Type = fileName.Substring(fileName.Length - 4, 4) == ".txt" ? FileType.Text : FileType.Binary;
             }
             else
             {
-                _type = FileType.binary;
+                Type = FileType.Binary;
             }
             _fileExtensionText = fileName.Contains('.') ? fileName.Substring(fileName.LastIndexOf('.')) : "";
         }
-        public FileType Type => _type;
+        public FileType Type { get; }
     }
     enum FileType
     {
-        text,
-        binary
+        Text,
+        Binary,
+        Unknown
     }
     internal static class DataOperationExensions
     {
         public static byte[] ObjectToByteArray<T>(this T o)
         {
-            if (o == null)
-                return new byte[] { };
+            if (o is null)
+            {
+                return Array.Empty<byte>();
+            }
 
             return Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(o, GetJsonSerializerOptions()));
         }        
@@ -100,7 +102,7 @@ namespace FileAbstraction
         internal static string SearchRead(this DirectoryItem directoryItem)
         {
             var fileName = Validation.IsDirectory(directoryItem.FileName)
-                ? directoryItem.FileName.Substring(directoryItem.FileName.LastIndexOf(Validation.SlashChar) + 1, (directoryItem.FileName.Length - 1) - (directoryItem.FileName.LastIndexOf(Validation.SlashChar) + 1))
+                ? directoryItem.FileName.Substring(directoryItem.FileName.LastIndexOf(Path.DirectorySeparatorChar) + 1, (directoryItem.FileName.Length - 1) - (directoryItem.FileName.LastIndexOf(Path.DirectorySeparatorChar) + 1))
                 : directoryItem.FileName;
 
             var startDir = Directory.GetCurrentDirectory();
@@ -113,12 +115,15 @@ namespace FileAbstraction
                 foreach (var filePath in Directory.GetFiles(subDirectory))
                 {
                     var name = new FileName(filePath);
-                    if (name.FileName == fileName) return File.ReadAllText(filePath);
+                    if (name.FileName == fileName)
+                    {
+                        return File.ReadAllText(filePath);
+                    }
                 }
             }
 
             var drives = DriveInfo.GetDrives();
-            var thisDrive = drives.Where(x => x.Name == startDir.Substring(0, 3)).Single();
+            var thisDrive = drives.Single(x => x.Name == startDir.Substring(0, 3));
 
             //Search back
             var currentDir = startDir;
@@ -128,7 +133,10 @@ namespace FileAbstraction
                 foreach (var filePath in Directory.GetFiles(currentDir))
                 {
                     var name = new FileName(filePath);
-                    if (name.FileName == fileName) return File.ReadAllText(filePath);
+                    if (name.FileName == fileName)
+                    {
+                        return File.ReadAllText(filePath);
+                    }
                 }
 
             } while (currentDir != thisDrive.Name);
@@ -141,7 +149,9 @@ namespace FileAbstraction
                 {
                     var resultOnDrive = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName);
                     if (resultOnDrive.Length > 0)
+                    {
                         return resultOnDrive;
+                    }
                 }
             }
             return "";  //File not found
@@ -156,26 +166,29 @@ namespace FileAbstraction
             {
                 files = root.GetFiles("*.*");
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
             }
-
-            catch (System.IO.DirectoryNotFoundException)
+            catch (DirectoryNotFoundException ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Skipping folder due to directory not found: {ex}");
             }
-
             if (files != null)
             {
                 foreach (System.IO.FileInfo fi in files)
                 {
-                    if (fi.Name == fileName) return File.ReadAllText(fi.FullName);
+                    if (fi.Name == fileName)
+                    {
+                        return File.ReadAllText(fi.FullName);
+                    }
                 }
-
                 subDirs = root.GetDirectories();
                 foreach (System.IO.DirectoryInfo dirInfo in subDirs)
                 {
+                    var specialFolders = Enum.GetValues(typeof(Environment.SpecialFolder)).Cast<Environment.SpecialFolder>().Select(Environment.GetFolderPath).ToList();
                     // Resursive call for each subdirectory.
-                    if (!(dirInfo.Name == "Windows" || dirInfo.Name == "Program Files(x86)" || dirInfo.Name == "Program Files"))    //Skip system folders, they are large and the user file is probably not here.
+                    if (!specialFolders.Contains(dirInfo.FullName))    //Skip system folders, they are large and the user file is probably not here.
                     {
                         WalkDirectoryTree(dirInfo, fileName);
                     }
