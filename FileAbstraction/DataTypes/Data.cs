@@ -8,8 +8,8 @@ namespace FileAbstraction
 {
     abstract internal class DirectoryItem
     {
-        public string FileName =>  _fileName ?? "";
-        protected string? _fileName;
+        public string Text =>  _text ?? "";
+        protected string? _text;
         protected string CorrectedFileName(string fileName)
         {
             if (Validation.IsWindows && (fileName.IndexOfAny(Validation.InvalidWindowsChars) != -1))
@@ -33,24 +33,22 @@ namespace FileAbstraction
             name = Validation.IsDirectory(name) ? Path.GetFileName(name) : name;
             name = CorrectedFileName(name);
             name = TrimmedFileName(name);
-            _fileName = name;
+            _text = name;
         }
     }
     internal class FilePath : DirectoryItem
     {
         public FilePath(string filePath)
         {
-            filePath = CorrectedFileName(filePath);
-
             if(filePath.Length > Validation.MaxDirectoryLength)
             {
                 FileName name = new FileName(Path.GetFileName(filePath).Substring(0,Validation.MaxDirectoryLength));
                 var dir = Path.GetDirectoryName(filePath);
-                _fileName = dir + Path.DirectorySeparatorChar + name.FileName;
+                _text = dir + Path.DirectorySeparatorChar + name.Text;
             }
             else
             {
-                _fileName = filePath;
+                _text = filePath;
             }            
         }
     }
@@ -59,7 +57,7 @@ namespace FileAbstraction
         private string _fileExtensionText;
         public FileObject(string fileName)
         {
-            _fileName = fileName;
+            _text = fileName;
             if (fileName.Length > 3)
             {
                 Type = fileName.Substring(fileName.Length - 4, 4) == ".txt" ? FileType.Text : FileType.Binary;
@@ -101,9 +99,9 @@ namespace FileAbstraction
         }
         internal static string SearchRead(this DirectoryItem directoryItem)
         {
-            var fileName = Validation.IsDirectory(directoryItem.FileName)
-                ? directoryItem.FileName.Substring(directoryItem.FileName.LastIndexOf(Path.DirectorySeparatorChar) + 1, (directoryItem.FileName.Length - 1) - (directoryItem.FileName.LastIndexOf(Path.DirectorySeparatorChar) + 1))
-                : directoryItem.FileName;
+            var fileName = Validation.IsDirectory(directoryItem.Text)
+                ? directoryItem.Text.Substring(directoryItem.Text.LastIndexOf(Path.DirectorySeparatorChar) + 1, (directoryItem.Text.Length - 1) - (directoryItem.Text.LastIndexOf(Path.DirectorySeparatorChar) + 1))
+                : directoryItem.Text;
 
             var startDir = Directory.GetCurrentDirectory();
 
@@ -115,7 +113,7 @@ namespace FileAbstraction
                 foreach (var filePath in Directory.GetFiles(subDirectory))
                 {
                     var name = new FileName(filePath);
-                    if (name.FileName == fileName)
+                    if (name.Text == fileName)
                     {
                         return File.ReadAllText(filePath);
                     }
@@ -133,7 +131,7 @@ namespace FileAbstraction
                 foreach (var filePath in Directory.GetFiles(currentDir))
                 {
                     var name = new FileName(filePath);
-                    if (name.FileName == fileName)
+                    if (name.Text == fileName)
                     {
                         return File.ReadAllText(filePath);
                     }

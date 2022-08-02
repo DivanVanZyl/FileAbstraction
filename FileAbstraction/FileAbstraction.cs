@@ -14,7 +14,7 @@
             try
             {
                 string fileContents;
-                using (TextReader reader = new StreamReader(path.FileName))
+                using (TextReader reader = new StreamReader(path.Text))
                 {
                     fileContents = reader.ReadToEnd();
                 }
@@ -34,7 +34,7 @@
             var fileName = allFiles.Single(x => (File.GetLastWriteTime(x) == latestFile));
 
             var file = new FileObject(fileName);
-            return File.ReadAllText(file.FileName);
+            return File.ReadAllText(file.Text);
         }
         public static string ReadFile(string input)
         {
@@ -44,7 +44,7 @@
                 var path = new FilePath(input);
                 try
                 {
-                    return File.ReadAllText(path.FileName);
+                    return File.ReadAllText(path.Text);
                 }
                 catch
                 {
@@ -55,7 +55,7 @@
             {
                 var name = new FileName(input);
                 var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
-                var match = allFiles.FirstOrDefault(x => x.Contains(name.FileName));
+                var match = allFiles.FirstOrDefault(x => x.Contains(name.Text));
 
                 return match is null ? name.SearchRead() : File.ReadAllText(match);
             }
@@ -72,30 +72,30 @@
         {
             if (o is string)
             {
-                if (path.FileName.Contains(".txt"))
+                if (path.Text.Contains(".txt"))
                 {
                     try
                     {
-                        File.WriteAllText(path.FileName, o.ToString());
+                        File.WriteAllText(path.Text, o.ToString());
                     }
                     catch (DirectoryNotFoundException)
                     {
-                        File.WriteAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + Path.GetFileName(path.FileName), o.ToString());
+                        File.WriteAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + Path.GetFileName(path.Text), o.ToString());
                     }
                 }
                 else
                 {
-                    File.WriteAllText(path.FileName + ".txt", o.ToString());
+                    File.WriteAllText(path.Text + ".txt", o.ToString());
                 }
             }
             else
             {
-                File.WriteAllBytes(path.FileName, o.ObjectToByteArray());
+                File.WriteAllBytes(path.Text, o.ObjectToByteArray());
             }
         }
         public static void ToFile<T>(this T o)
         {
-            FilePath filePath = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{Path.DirectorySeparatorChar}{Environment.UserName}");
+            FilePath filePath = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{Environment.UserName}");
             WriteToFile(o, filePath);
 
         }
@@ -109,7 +109,7 @@
             else
             {
                 var fileName = new FileName(input);
-                var path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{fileName.FileName}");
+                var path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{fileName.Text}");
                 WriteToFile(o, path);
             }
         }
