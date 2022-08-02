@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConsoleFileOperations": {
+      "commandName": "Project",
+      "commandLineArgs": " \"r\" \"And I hide here.txt\""
+    }
+  }
+}
