@@ -10,10 +10,11 @@ namespace FileAbstraction
     {
         internal static bool IsDirectory(string s) => s.Contains(Path.DirectorySeparatorChar);
         internal static int MaxFileNameLength => IsWindows ? ((IsLongPathsEnabled()) ? 32767 : 255) : 255;
-        internal static int MaxDirectoryLength => IsLinux ? 4096 : 260;        
+        internal static int MaxDirectoryLength => IsLinux ? 4096 : 260;
         internal static char[] InvalidWindowsChars => new char[] { '<', '>', ':', '"', '/', '|', '?', '*' };
         internal static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         internal static bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        internal static List<string> LinuxSystemDrives { get; } = new List<string> { "/sys", "/proc", "/lib" };
 
         internal static bool IsLongPathsEnabled()
         {

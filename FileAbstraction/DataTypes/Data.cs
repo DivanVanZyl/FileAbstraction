@@ -8,7 +8,7 @@ namespace FileAbstraction
 {
     abstract internal class DirectoryItem
     {
-        public string Text =>  _text ?? "";
+        public string Text => _text ?? "";
         protected string? _text;
         protected string CorrectedFileName(string fileName)
         {
@@ -40,16 +40,16 @@ namespace FileAbstraction
     {
         public FilePath(string filePath)
         {
-            if(filePath.Length > Validation.MaxDirectoryLength)
+            if (filePath.Length > Validation.MaxDirectoryLength)
             {
-                FileName name = new FileName(Path.GetFileName(filePath).Substring(0,Validation.MaxDirectoryLength));
+                FileName name = new FileName(Path.GetFileName(filePath).Substring(0, Validation.MaxDirectoryLength));
                 var dir = Path.GetDirectoryName(filePath);
                 _text = dir + Path.DirectorySeparatorChar + name.Text;
             }
             else
             {
                 _text = filePath;
-            }            
+            }
         }
     }
     internal class FileObject : DirectoryItem
@@ -86,7 +86,7 @@ namespace FileAbstraction
             }
 
             return Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(o, GetJsonSerializerOptions()));
-        }        
+        }
         private static JsonSerializerOptions GetJsonSerializerOptions()
         {
             return new JsonSerializerOptions()
@@ -106,51 +106,71 @@ namespace FileAbstraction
             var startDir = Directory.GetCurrentDirectory();
 
             //Search deeper
-            var subDirectories = Directory.GetDirectories(startDir, "*", SearchOption.AllDirectories);
-
-            foreach (var subDirectory in subDirectories)
+            try
             {
-                foreach (var filePath in Directory.GetFiles(subDirectory))
+                var subDirectories = Directory.GetDirectories(startDir, "*", SearchOption.AllDirectories);
+
+                foreach (var subDirectory in subDirectories)
                 {
-                    var name = new FileName(filePath);
-                    if (name.Text == fileName)
+                    foreach (var filePath in Directory.GetFiles(subDirectory))
                     {
-                        return File.ReadAllText(filePath);
+                        var name = new FileName(filePath);
+                        if (name.Text == fileName)
+                        {
+                            return File.ReadAllText(filePath);
+                        }
                     }
                 }
             }
-
-            var drives = DriveInfo.GetDrives();
-            var thisDrive = drives.Single(x => x.Name == startDir.Substring(0, 3));
-
-            //Search back
-            var currentDir = startDir;
-            do
+            catch (UnauthorizedAccessException ex)
             {
-                currentDir = Path.GetFullPath(Path.Combine(currentDir, ".."));
-                foreach (var filePath in Directory.GetFiles(currentDir))
+                System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
+            }
+
+            var drives = Validation.IsWindows ? DriveInfo.GetDrives() : new DriveInfo[] { new DriveInfo("/") };
+            var rootPath = Path.GetPathRoot(startDir);
+            var thisDrive = new DriveInfo(rootPath);
+            //Search back
+            try
+            {
+                var currentDir = startDir;
+                do
                 {
-                    var name = new FileName(filePath);
-                    if (name.Text == fileName)
+                    currentDir = Path.GetFullPath(Path.Combine(currentDir, ".."));
+                    foreach (var filePath in Directory.GetFiles(currentDir))
                     {
-                        return File.ReadAllText(filePath);
+                        var name = new FileName(filePath);
+                        if (name.Text == fileName)
+                        {
+                            return File.ReadAllText(filePath);
+                        }
                     }
-                }
 
-            } while (currentDir != thisDrive.Name);
-
+                } while (currentDir != thisDrive.Name);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
+            }
 
             //Search all drives
-            foreach (var drive in drives)
+            try
             {
-                if (drive.IsReady)
+                foreach (var drive in drives)
                 {
-                    var resultOnDrive = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName);
-                    if (resultOnDrive.Length > 0)
+                    if (drive.IsReady)
                     {
-                        return resultOnDrive;
+                        var resultOnDrive = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName);
+                        if (resultOnDrive.Length > 0)
+                        {
+                            return resultOnDrive;
+                        }
                     }
                 }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
             }
             return "";  //File not found
         }
@@ -175,7 +195,7 @@ namespace FileAbstraction
             if (files != null)
             {
                 foreach (System.IO.FileInfo fi in files)
-                {
+                {                    
                     if (fi.Name == fileName)
                     {
                         return File.ReadAllText(fi.FullName);
@@ -184,7 +204,7 @@ namespace FileAbstraction
                 subDirs = root.GetDirectories();
                 foreach (System.IO.DirectoryInfo dirInfo in subDirs)
                 {
-                    var specialFolders = Enum.GetValues(typeof(Environment.SpecialFolder)).Cast<Environment.SpecialFolder>().Select(Environment.GetFolderPath).ToList();
+                    var specialFolders = Validation.IsWindows ? Enum.GetValues(typeof(Environment.SpecialFolder)).Cast<Environment.SpecialFolder>().Select(Environment.GetFolderPath).ToList() : Validation.LinuxSystemDrives;
                     // Resursive call for each subdirectory.
                     if (!specialFolders.Contains(dirInfo.FullName))    //Skip system folders, they are large and the user file is probably not here.
                     {
@@ -195,5 +215,4 @@ namespace FileAbstraction
             return "";
         }
     }
-
 }

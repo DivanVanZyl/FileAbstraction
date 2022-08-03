@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleFileOperations": {
       "commandName": "Project",
-      "commandLineArgs": " \"r\" \"And I hide here.txt\""
+      "commandLineArgs": "\"r\" \"4\" \"3\" \"3\""
     }
   }
 }
