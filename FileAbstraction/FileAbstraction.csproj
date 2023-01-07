@@ -4,8 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>Divan.Util.FileAbstraction</PackageId>
-    <Title>FileAbstraction</Title>
+    <PackageId>Util.File.Abstraction</PackageId>
+    <Title>File.Abstraction</Title>
     <Authors>Divan van Zyl</Authors>
     <Description>File Syntax Abstraction for C# using Reflection.</Description>
     <RepositoryUrl>https://github.com/DivanVanZyl/FileAbstraction</RepositoryUrl>
