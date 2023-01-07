@@ -4,7 +4,23 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>Divan.Util.FileAbstraction</PackageId>
+    <Title>FileAbstraction</Title>
+    <Authors>Divan van Zyl</Authors>
+    <Description>File Syntax Abstraction for C# using Reflection.</Description>
+    <RepositoryUrl>https://github.com/DivanVanZyl/FileAbstraction</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>File;Abstraction;State;Saving;Repository</PackageTags>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageLicenseFile>MIT licence.txt</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\MIT licence.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
