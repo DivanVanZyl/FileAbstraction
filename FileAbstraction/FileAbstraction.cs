@@ -3,7 +3,7 @@
     /// <summary>
     /// For File => Object
     /// </summary>
-    public static class FileAbstraction
+    public static class FileAbstract
     {
         public static T ReadBinFile<T>() where T : new()
         {

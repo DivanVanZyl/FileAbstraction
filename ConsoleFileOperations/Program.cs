@@ -8,7 +8,7 @@
             {
                 if (args[0] == "r")
                 {
-                     Console.Out.WriteLine(FileAbstraction.ReadFile(args[1]));
+                     Console.Out.WriteLine(FileAbstract.ReadFile(args[1]));
                 }
                 else if(args[0] == "w")
                 {
@@ -23,7 +23,7 @@
             {
                 if (args[0] == "r")
                 {
-                    Console.Out.WriteLine(FileAbstraction.ReadFile(args[1]));
+                    Console.Out.WriteLine(FileAbstract.ReadFile(args[1]));
                 }
                 else if (args[0] == "w")
                 {
