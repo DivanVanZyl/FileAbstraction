@@ -7,6 +7,9 @@
     <Nullable>enable</Nullable>
     <AssemblyName>f</AssemblyName>
     <Authors>Divan van Zyl</Authors>
+	  <PackAsTool>true</PackAsTool>
+	  <ToolCommandName>f</ToolCommandName>
+	  <PackageOutputPath>./nupkg</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
