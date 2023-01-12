@@ -129,6 +129,17 @@ namespace FileAbstraction
 
             var drives = Validation.IsWindows ? DriveInfo.GetDrives() : new DriveInfo[] { new DriveInfo("/") };
             var rootPath = Path.GetPathRoot(startDir);
+            if(rootPath is null)
+            {
+                if(Validation.IsWindows)
+                {
+                    rootPath = @"C:\";
+                }
+                else
+                {
+                    rootPath = @"/";
+                }
+            }
             var thisDrive = new DriveInfo(rootPath);
             //Search back
             try
@@ -176,24 +187,13 @@ namespace FileAbstraction
         }
         private static string WalkDirectoryTree(System.IO.DirectoryInfo root, string fileName)
         {
-            System.IO.FileInfo[] files = null;
-            System.IO.DirectoryInfo[] subDirs = null;
+            System.IO.FileInfo[] files;
+            System.IO.DirectoryInfo[] subDirs;
 
             // First, process all the files directly under this folder
             try
             {
                 files = root.GetFiles("*.*");
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
-            }
-            catch (DirectoryNotFoundException ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Skipping folder due to directory not found: {ex}");
-            }
-            if (files != null)
-            {
                 foreach (System.IO.FileInfo fi in files)
                 {                    
                     if (fi.Name == fileName)
@@ -211,6 +211,14 @@ namespace FileAbstraction
                         WalkDirectoryTree(dirInfo, fileName);
                     }
                 }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Skipping folder due to directory not found: {ex}");
             }
             return "";
         }
