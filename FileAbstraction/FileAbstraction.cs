@@ -1,4 +1,8 @@
-﻿namespace FileAbstraction
+﻿using FileAbstraction.Data;
+using FileAbstraction.Data.DataTypes;
+using static FileAbstraction.Search;
+
+namespace FileAbstraction
 {
     /// <summary>
     /// For File => Object
@@ -36,7 +40,7 @@
             var file = new FileObject(fileName);
             return File.ReadAllText(file.Text);
         }
-        public static string ReadFile(string input)
+        public static string ReadFile(string input, SearchDepth searchDepth = SearchDepth.Shallow)
         {
             //name or path
             if (Validation.IsDirectory(input))
@@ -48,7 +52,8 @@
                 }
                 catch
                 {
-                    return path.SearchRead();
+                    return path.SearchRead(searchDepth).Data;
+
                 }
             }
             else
@@ -57,7 +62,7 @@
                 var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
                 var match = allFiles.FirstOrDefault(x => x.Contains(name.Text));
 
-                return match is null ? name.SearchRead() : File.ReadAllText(match);
+                return match is not null ? File.ReadAllText(match) : name.SearchRead(searchDepth).Data;
             }
         }
         public static void DisplayFile() => Console.WriteLine(ReadFile());

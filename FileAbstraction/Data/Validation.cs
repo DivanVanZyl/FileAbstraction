@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileAbstraction
+namespace FileAbstraction.Data
 {
     internal class Validation
     {
         internal static bool IsDirectory(string s) => s.Contains(Path.DirectorySeparatorChar);
-        internal static int MaxFileNameLength => IsWindows ? ((IsLongPathsEnabled()) ? 32767 : 255) : 255;
+        internal static int MaxFileNameLength => IsWindows ? IsLongPathsEnabled() ? 32767 : 255 : 255;
         internal static int MaxDirectoryLength => IsLinux ? 4096 : 260;
         internal static char[] InvalidWindowsChars => new char[] { '<', '>', ':', '"', '/', '|', '?', '*' };
         internal static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
