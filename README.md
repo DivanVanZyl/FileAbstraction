@@ -25,4 +25,3 @@ c.ToFile();
 var savedC = FileAbstraction.ReadBinFile<Computer>();
 Console.WriteLine(savedC.Name);
 ```
-Improvement: Wrap results in a result class, that can return usefull info, like the path where a file was found.
