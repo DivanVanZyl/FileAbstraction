@@ -12,9 +12,10 @@ Then, you can display the file with `FileAbstract.DisplayFile();` (It will figur
 
 You can also specify specific paths, but the FileAbstraction library will try to find your file based on the name,
 even if it is not found. For example:
-
-`"This was found in my user folder".ToFile( Path.Combine(@"C:","Users",$"{ Environment.UserName}", "Downloads", "myFile.txt"));`
-`FileAbstraction.DisplayFile("myFile.txt");`
+```
+"Some file content".ToFile( "Some user directory", "myFile.txt"));
+FileAbstraction.DisplayFile("myFile.txt");
+```
 
 You can serialise objects to/from files, for example:
 
