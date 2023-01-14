@@ -61,7 +61,7 @@ namespace FileAbstraction
             return new SearchResult<string>(
                 new FileNotFoundException("File cannot be found with the " + searchDepth.ToString() + " search."), "");
         }
-
+        //Shallow foreward search
         private static SearchResult<string> ShallowSearch(string fileName, string startDir)
         {
             try

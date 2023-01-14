@@ -63,6 +63,6 @@ namespace FileAbstraction
             }
         }
         public static void DisplayFile() => Console.WriteLine(ReadFile());
-        public static void DisplayFile(string input) => Console.WriteLine(ReadFile(input));
+        public static void DisplayFile(string input, SearchDepth depth = SearchDepth.Shallow) => Console.WriteLine(ReadFile(input, depth));
     }    
 }
