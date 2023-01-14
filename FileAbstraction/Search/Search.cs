@@ -1,13 +1,12 @@
 ﻿using FileAbstraction.Data;
 using FileAbstraction.Data.DataTypes;
-using FileAbstraction.Data.Search;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileAbstraction.Search
+namespace FileAbstraction
 {
     internal static class Search
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileAbstraction.Search
+namespace FileAbstraction
 {
     internal class SearchResult<T>
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileAbstraction.Search.Search
+namespace FileAbstraction
 {
     /// <summary>
     /// Search Forward from current directory

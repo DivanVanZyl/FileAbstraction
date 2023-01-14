@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FileAbstraction.Data;
 
-namespace FileAbstraction.Search.Search
+namespace FileAbstraction
 {
     internal class AllDrivesForwardSearch : ISearch
     {
