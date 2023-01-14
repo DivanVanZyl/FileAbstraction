@@ -1,4 +1,6 @@
-﻿namespace FileAbstraction
+﻿using FileAbstraction;
+
+namespace ConsoleFileOperations
 {
     class Program
     {
