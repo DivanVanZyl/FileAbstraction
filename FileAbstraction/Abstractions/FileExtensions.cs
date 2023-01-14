@@ -12,7 +12,7 @@ namespace FileAbstraction
     {
         private static void WriteToFile<T>(T o, FilePath path)
         {
-            if (o is string)
+            if (Validation.IsTextType(o))
             {
                 if (path.Text.Contains(".txt"))
                 {

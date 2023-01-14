@@ -15,7 +15,6 @@ namespace FileAbstraction.Data
         internal static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         internal static bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
         internal static List<string> LinuxSystemDrives { get; } = new List<string> { "/sys", "/proc", "/lib" };
-
         internal static bool IsLongPathsEnabled()
         {
             var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem");
@@ -30,6 +29,14 @@ namespace FileAbstraction.Data
                 return false;
             }
             return (int)regVal > 0;
+        }
+        internal static bool IsTextType(object o)
+        {
+            return o is string
+                || o is string[]
+                || o is char
+                || o is List<string>
+                || o is List<char>;
         }
     }
 }
