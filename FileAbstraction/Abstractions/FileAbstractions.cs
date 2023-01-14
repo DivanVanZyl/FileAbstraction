@@ -48,7 +48,8 @@ namespace FileAbstraction
                 }
                 catch
                 {
-                    return path.SearchRead(searchDepth).Data;
+                    var data = path.SearchRead(searchDepth).Data;
+                    return data is null ? "" : data;
 
                 }
             }
@@ -58,7 +59,8 @@ namespace FileAbstraction
                 var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
                 var match = allFiles.FirstOrDefault(x => x.Contains(name.Text));
 
-                return match is not null ? File.ReadAllText(match) : name.SearchRead(searchDepth).Data;
+                var data = match is not null ? File.ReadAllText(match) : name.SearchRead(searchDepth).Data;
+                return data is null ? "" : data;
             }
         }
         public static void DisplayFile() => Console.WriteLine(ReadFile());

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,19 +9,18 @@ namespace FileAbstraction
 {
     internal class SearchResult<T>
     {
-        public SearchResult(T data, bool isSuccess)
+        public SearchResult(T data)
         {
+            IsSuccess = true;
             Data = data;
-            IsSuccess = isSuccess;
         }
-        public SearchResult(Exception e, T data, bool isSuccess)
+        public SearchResult(Exception e)
         {
+            IsSuccess = false;
             Exception = e;
-            Data = data;
-            IsSuccess = isSuccess;
         }
         public Exception? Exception { get; }
-        public T Data { get; }
+        public T? Data { get; }
         public bool IsSuccess { get; }
     }
 }

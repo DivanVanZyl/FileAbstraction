@@ -1,6 +1,7 @@
 ﻿using FileAbstraction.Data;
 using FileAbstraction.Data.DataTypes;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,10 +14,11 @@ namespace FileAbstraction
         internal static SearchResult<string> SearchRead(this DirectoryItem directoryItem, SearchDepth searchDepth)
         {
             var fileName = Validation.IsDirectory(directoryItem.Text)
-                ? directoryItem.Text.Substring(directoryItem.Text.LastIndexOf(Path.DirectorySeparatorChar) + 1, directoryItem.Text.Length - 1 - (directoryItem.Text.LastIndexOf(Path.DirectorySeparatorChar) + 1))
+                ? GetFileName(directoryItem)
                 : directoryItem.Text;
 
-            List<ISearch> searches = new List<ISearch>
+            Hashtable hashtable = new Hashtable(1000000,0.7f);
+            List<FileSearch> searches = new List<FileSearch>
             {
                 new ForwardSearch(),
                 new BackToRootSearch(),
@@ -27,7 +29,7 @@ namespace FileAbstraction
             {
                 if (search.SearchDepth >= searchDepth)
                 {
-                    var result = search.Search(fileName, Directory.GetCurrentDirectory());
+                    var result = search.Search(fileName, ref hashtable, Directory.GetCurrentDirectory());
                     if (result.IsSuccess)
                     {
                         return result;
@@ -38,6 +40,7 @@ namespace FileAbstraction
                             result.Exception is not null ?
                             result.Exception.Message :
                             search.ToString() + " did not find the file: " + fileName);
+
                     }
                 }
             }
@@ -45,7 +48,15 @@ namespace FileAbstraction
                 new FileNotFoundException(
                     "File cannot be found with the " +
                     searchDepth.ToString() +
-                    " search."), "", false);
+                    " search."));
+        }
+
+        private static string GetFileName(DirectoryItem fullPath)
+        {
+            return fullPath.Text.Substring(
+                fullPath.Text.LastIndexOf(Path.DirectorySeparatorChar) + 1,
+                fullPath.Text.Length - 1 - (fullPath.Text.LastIndexOf(Path.DirectorySeparatorChar) + 1
+                ));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FileAbstraction.Data;
 using FileAbstraction.Data.DataTypes;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace FileAbstraction
 {
-    internal class BackToRootSearch : ISearch
+    internal class BackToRootSearch : FileSearch
     {
-        public SearchDepth SearchDepth => SearchDepth.Deep;
+        public new static SearchDepth SearchDepth => SearchDepth.Deep;
 
-        public SearchResult<string> Search(string fileName, string startDir = "")
+        public override SearchResult<string> Search(string fileName, ref Hashtable hashtable, string startDir = "")
         {
             var rootPath = Path.GetPathRoot(startDir);
             if (rootPath is null)
@@ -34,13 +35,10 @@ namespace FileAbstraction
                 do
                 {
                     currentDir = Path.GetFullPath(Path.Combine(currentDir, ".."));
-                    foreach (var filePath in Directory.GetFiles(currentDir))
+                    var result = SearchSubDirectoryForFile(currentDir, fileName, ref hashtable);
+                    if (result.IsSuccess)
                     {
-                        var name = new FileName(filePath);
-                        if (name.Text == fileName)
-                        {
-                            return new SearchResult<string>(File.ReadAllText(filePath), true);
-                        }
+                        return result;
                     }
 
                 } while (currentDir != thisDrive.Name);
@@ -49,7 +47,7 @@ namespace FileAbstraction
             {
                 System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
             }
-            return new SearchResult<string>(new FileNotFoundException("Did not find the file: " + fileName), "", false);
+            return new SearchResult<string>(new FileNotFoundException("Did not find the file: " + fileName));
         }
     }
 }

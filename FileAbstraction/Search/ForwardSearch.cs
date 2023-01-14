@@ -1,5 +1,6 @@
 ﻿using FileAbstraction.Data.DataTypes;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,11 +11,11 @@ namespace FileAbstraction
     /// <summary>
     /// Search Forward from current directory
     /// </summary>
-    internal class ForwardSearch : ISearch
+    internal class ForwardSearch : FileSearch
     {
-        public SearchDepth SearchDepth => SearchDepth.Shallow;
+        public static new SearchDepth SearchDepth => SearchDepth.Shallow;
 
-        public SearchResult<string> Search(string fileName, string startDir = "")
+        public override SearchResult<string> Search(string fileName, ref Hashtable hashtable, string startDir = "")
         {
             try
             {
@@ -22,13 +23,10 @@ namespace FileAbstraction
 
                 foreach (var subDirectory in subDirectories)
                 {
-                    foreach (var filePath in Directory.GetFiles(subDirectory))
+                    var result = SearchSubDirectoryForFile(subDirectory, fileName, ref hashtable);
+                    if(result.IsSuccess)
                     {
-                        var name = new FileName(filePath);
-                        if (name.Text == fileName)
-                        {
-                            return new SearchResult<string>(File.ReadAllText(filePath), true);
-                        }
+                        return result;
                     }
                 }
             }
@@ -36,7 +34,7 @@ namespace FileAbstraction
             {
                 System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
             }
-            return new SearchResult<string>(new FileNotFoundException("Shallow search did not find the file. Filename: " + fileName), "", false);
+            return new SearchResult<string>(new FileNotFoundException("Shallow search did not find the file. Filename: " + fileName));
         }
     }
 }

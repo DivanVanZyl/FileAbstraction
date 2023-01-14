@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +8,11 @@ using FileAbstraction.Data;
 
 namespace FileAbstraction
 {
-    internal class AllDrivesForwardSearch : ISearch
+    internal class AllDrivesForwardSearch : FileSearch
     {
-        public SearchDepth SearchDepth => SearchDepth.Full;
+        public new static SearchDepth SearchDepth => SearchDepth.Full;
 
-        public SearchResult<string> Search(string fileName, string startDir = "")
+        public override SearchResult<string> Search(string fileName, ref Hashtable hashtable, string startDir = "")
         {
             var drives = Validation.IsWindows ? DriveInfo.GetDrives() : new DriveInfo[] { new DriveInfo("/") };
             try
@@ -20,10 +21,10 @@ namespace FileAbstraction
                 {
                     if (drive.IsReady)
                     {
-                        var resultOnDrive = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName);
-                        if (resultOnDrive.Length > 0)
+                        var result = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName,hashtable);
+                        if (result.IsSuccess)
                         {
-                            return new SearchResult<string>(resultOnDrive, true);
+                            return result;
                         }
                     }
                 }
@@ -32,25 +33,23 @@ namespace FileAbstraction
             {
                 System.Diagnostics.Debug.WriteLine($"Skipping folder due to access exception: {ex}");
             }
-            return new SearchResult<string>(new FileNotFoundException("Full search did not find the file. Filename: " + fileName), "", false);
+            return new SearchResult<string>(new FileNotFoundException("Full search did not find the file. Filename: " + fileName));
         }
 
-        private static string WalkDirectoryTree(DirectoryInfo root, string fileName)
+        private SearchResult<string> WalkDirectoryTree(DirectoryInfo root, string fileName, Hashtable hashtable)
         {
-            FileInfo[] files;
             DirectoryInfo[] subDirs;
 
             // First, process all the files directly under this folder
             try
             {
-                files = root.GetFiles("*.*");
-                foreach (FileInfo fi in files)
+                var result = SearchSubDirectoryForFile(root.FullName, fileName, ref hashtable);
+                if (result.IsSuccess)
                 {
-                    if (fi.Name == fileName)
-                    {
-                        return File.ReadAllText(fi.FullName);
-                    }
+                    return result;
                 }
+
+
                 subDirs = root.GetDirectories();
                 foreach (DirectoryInfo dirInfo in subDirs)
                 {
@@ -58,7 +57,7 @@ namespace FileAbstraction
                     // Resursive call for each subdirectory.
                     if (!specialFolders.Contains(dirInfo.FullName))    //Skip system folders, they are large and the user file is probably not here.
                     {
-                        WalkDirectoryTree(dirInfo, fileName);
+                        WalkDirectoryTree(dirInfo, fileName, hashtable);
                     }
                 }
             }
@@ -70,7 +69,7 @@ namespace FileAbstraction
             {
                 System.Diagnostics.Debug.WriteLine($"Skipping folder due to directory not found: {ex}");
             }
-            return "";
+            return new SearchResult<string>(new FileNotFoundException());
         }
     }
 }
