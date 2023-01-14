@@ -1,6 +1,7 @@
 ﻿using FileAbstraction.Data;
 using FileAbstraction.Data.DataTypes;
-using static FileAbstraction.Search;
+using FileAbstraction.Search;
+using static FileAbstraction.Search.Search;
 
 namespace FileAbstraction
 {

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileAbstraction
+namespace FileAbstraction.Search
 {
     internal static class Search
     {
@@ -24,9 +24,9 @@ namespace FileAbstraction
                 new AllDrivesForwardSearch()
             };
 
-            foreach(var search in searches)
+            foreach (var search in searches)
             {
-                if(search.SearchDepth >= searchDepth)
+                if (search.SearchDepth >= searchDepth)
                 {
                     var result = search.Search(fileName, Directory.GetCurrentDirectory());
                     if (result.IsSuccess)

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FileAbstraction.Data;
 
-namespace FileAbstraction.Data.Search
+namespace FileAbstraction.Search.Search
 {
     internal class AllDrivesForwardSearch : ISearch
     {

@@ -1,11 +1,12 @@
-﻿using FileAbstraction.Data.DataTypes;
+﻿using FileAbstraction.Data;
+using FileAbstraction.Data.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileAbstraction.Data.Search
+namespace FileAbstraction.Search.Search
 {
     internal class BackToRootSearch : ISearch
     {
