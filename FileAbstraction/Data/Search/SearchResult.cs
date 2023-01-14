@@ -8,16 +8,19 @@ namespace FileAbstraction
 {
     internal class SearchResult<T>
     {
-        public SearchResult(T data)
+        public SearchResult(T data, bool isSuccess)
         {
             Data = data;
+            IsSuccess = isSuccess;
         }
-        public SearchResult(Exception e, T data)
+        public SearchResult(Exception e, T data, bool isSuccess)
         {
             Exception = e;
             Data = data;
+            IsSuccess = isSuccess;
         }
         public Exception? Exception { get; }
         public T Data { get; }
+        public bool IsSuccess { get; }
     }
 }
