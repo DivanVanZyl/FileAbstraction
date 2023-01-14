@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "ConsoleFileOperations": {
-      "commandName": "Project",
-      "commandLineArgs": "\"r\" \"4\" \"3\" \"3\""
-    }
-  }
-}
