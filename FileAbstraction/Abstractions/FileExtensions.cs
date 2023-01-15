@@ -11,37 +11,33 @@ namespace FileAbstraction
 {
     public static class FileExtensions
     {
-        public static void ToBinFile(this byte[] bytes, string path = "")
+        public static void ToFile<T>(this T o, string inputPath = "")
         {
-            if (path == "")
+            FilePath path = new FilePath(inputPath);
+            if (path.Text == "")
             {
-                File.WriteAllBytes(
-                    new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{Environment.UserName}").Text,
-                    bytes);
+                path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{Environment.UserName}");
             }
             else
             {
-                File.WriteAllBytes(
-                    new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{new FileName(path).Text}").Text,
-                    bytes);
+                if (!Validation.IsDirectory(path.Text))
+                {
+                    path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{new FileName(path.Text).Text}");
+                }
             }
-        }
-        public static void ToFile<T>(this T o)
-        {
-            FilePath filePath = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{Environment.UserName}");
-            WriteToFile(o, filePath);
-        }
-        public static void ToFile<T>(this T o, string input)
-        {
-            if (Validation.IsDirectory(input))
+
+            if (o is null)
             {
-                var path = new FilePath(input);
-                WriteToFile(o, path);
+                File.WriteAllBytes(path.Text, new byte[0]);
+                return;
+            }
+            else if (o.GetType() == typeof(byte[]))
+            {
+                var bytes = (byte[])Convert.ChangeType(o, typeof(T));
+                File.WriteAllBytes(path.Text, bytes);
             }
             else
             {
-                var fileName = new FileName(input);
-                var path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{fileName.Text}");
                 WriteToFile(o, path);
             }
         }

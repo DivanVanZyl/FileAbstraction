@@ -29,7 +29,7 @@ namespace FileAbstractionTests
         {
             string text = "This is a test.";
             byte[] bytes = Encoding.ASCII.GetBytes(text);
-            bytes.ToBinFile();
+            bytes.ToFile();
             var savedBytes = FileAbstract.ReadBinFile();
             Assert.Equal(text, Encoding.ASCII.GetString(savedBytes));
         }
