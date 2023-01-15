@@ -13,7 +13,7 @@ namespace FileAbstraction
     {
         public static void ToBinFile(this byte[] bytes, string path = "")
         {
-            if(path == "")
+            if (path == "")
             {
                 File.WriteAllBytes(
                     new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{Environment.UserName}").Text,
@@ -49,20 +49,13 @@ namespace FileAbstraction
         {
             if (Validation.IsTextType(o))
             {
-                if (path.Text.Contains(".txt"))
+                try
                 {
-                    try
-                    {
-                        File.WriteAllText(path.Text, o.ToString());
-                    }
-                    catch (DirectoryNotFoundException)
-                    {
-                        File.WriteAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + Path.GetFileName(path.Text), o.ToString());
-                    }
+                    File.WriteAllText(path.Text, o.ToString());
                 }
-                else
+                catch (DirectoryNotFoundException)
                 {
-                    File.WriteAllText(path.Text + ".txt", o.ToString());
+                    File.WriteAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + Path.GetFileName(path.Text), o.ToString());
                 }
             }
             else

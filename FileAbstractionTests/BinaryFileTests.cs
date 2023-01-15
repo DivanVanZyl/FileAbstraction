@@ -40,6 +40,7 @@ namespace FileAbstractionTests
             var c = new Computer();
             c.ToFile();
             var savedC = FileAbstract.ReadBinFile<Computer>();
+            Assert.NotNull(savedC);
             Assert.Equal(c.Name, savedC.Name);
         }
 
@@ -54,9 +55,6 @@ namespace FileAbstractionTests
         }
     }
 
-    /// <summary>
-    /// This class has a default constructor
-    /// </summary>
     internal class Computer
     {
         public Computer()

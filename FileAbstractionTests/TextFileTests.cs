@@ -25,5 +25,15 @@ namespace FileAbstractionTests
             Assert.NotNull(result);
             Assert.Equal("128", result);
         }
+
+        [Fact]
+        public void ReadFileAsTextNoExtension()
+        {
+            const string fileName = "myText";
+            "128".ToFile(fileName);
+            var result = FileAbstract.ReadFile(fileName);
+            Assert.NotNull(result);
+            Assert.Equal("128", result);
+        }
     }    
 }
