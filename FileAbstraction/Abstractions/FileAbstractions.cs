@@ -1,30 +1,51 @@
 ﻿using FileAbstraction.Data;
 using FileAbstraction.Data.DataTypes;
+using System.IO;
+using System.Text;
 
 namespace FileAbstraction
 {
     public static class FileAbstract
     {
-        public static T ReadBinFile<T>() where T : new()
+        public static T? ReadBinFile<T>(string path = "")
         {
             var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
             var latestFile = allFiles.Max(File.GetLastWriteTime);
-            var path = new FilePath(allFiles.Single(x => File.GetLastWriteTime(x) == latestFile));
+            if(path == "")
+            {
+                path = new FilePath(allFiles.First(x => File.GetLastWriteTime(x) == latestFile)).Text;
+            }
+
+            string fileContents;
+            using (TextReader reader = new StreamReader(path))
+            {
+                fileContents = reader.ReadToEnd();
+            }
+            return JsonConvert.DeserializeObject<T>(fileContents);
+        }
+        public static byte[] ReadBinFile(string path = "")
+        {
+            var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
+            var latestFile = allFiles.Max(File.GetLastWriteTime);
+            if (path == "")
+            {
+                path = new FilePath(allFiles.First(x => File.GetLastWriteTime(x) == latestFile)).Text;
+            }
 
             try
             {
-                string fileContents;
-                using (TextReader reader = new StreamReader(path.Text))
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
                 {
-                    fileContents = reader.ReadToEnd();
+                    using (var ms = new MemoryStream())
+                    {
+                        reader.BaseStream.CopyTo(ms);
+                        return ms.ToArray();
+                    }
                 }
-
-                var payload = JsonConvert.DeserializeObject<T>(fileContents);
-                return payload ?? new T();
             }
             catch
             {
-                return new T();
+                return new byte[0];
             }
         }
         public static string ReadFile()
@@ -65,5 +86,5 @@ namespace FileAbstraction
         }
         public static void DisplayFile() => Console.WriteLine(ReadFile());
         public static void DisplayFile(string input, SearchDepth depth = SearchDepth.Shallow) => Console.WriteLine(ReadFile(input, depth));
-    }    
+    }
 }

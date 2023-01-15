@@ -17,6 +17,15 @@ namespace Demo
             FileAbstract.DisplayFile();
             Text.PrintLineSeperator();
         }
+        public static void SearchIncorrectParam()
+        {
+            //An even more complex search, here the caller supplied an incorrect path (Drive does not exist). The library will try to find the file, even if the param is incorrect.
+            Console.WriteLine("Search for a file, where a path param was supplied, but is incorrent:");
+            "You found me, event though an incorrect path was given!"
+                .ToFile(Path.Combine("X:", "I hide here.txt"));
+            FileAbstract.DisplayFile("I hide here.txt");
+            Text.PrintLineSeperator();
+        }
 
         public static void SearchShallow()
         {
@@ -37,15 +46,6 @@ namespace Demo
             Text.PrintLineSeperator();
         }
 
-        public static void SearchIncorrectParam()
-        {
-            //An even more complex search, here the caller supplied an incorrect path (Drive does not exist). The library will try to find the file, even if the param is incorrect.
-            Console.WriteLine("Search for a file, where a path param was supplied, but is incorrent:");
-            "You found me, event though an incorrect path was given!"
-                .ToFile(Path.Combine("X:", "I hide here.txt"));
-            FileAbstract.DisplayFile("I hide here.txt");
-            Text.PrintLineSeperator();
-        }
 
         public static void SearchFull()
         {

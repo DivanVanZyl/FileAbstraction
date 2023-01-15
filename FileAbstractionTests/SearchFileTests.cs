@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FileAbstractionTests
 {
-    internal class FileSearch
+    internal class SearchFileTests
     {
     }
 }

@@ -25,9 +25,10 @@ namespace FileAbstraction
                 new AllDrivesForwardSearch()
             };
 
+
             foreach (var search in searches)
             {
-                if (search.SearchDepth >= searchDepth)
+                if (search.SearchDepth <= searchDepth)
                 {
                     var result = search.Search(fileName, ref hashtable, Directory.GetCurrentDirectory());
                     if (result.IsSuccess)

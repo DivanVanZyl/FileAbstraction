@@ -13,7 +13,7 @@ namespace FileAbstraction
     /// </summary>
     internal class ForwardSearch : FileSearch
     {
-        public static new SearchDepth SearchDepth => SearchDepth.Shallow;
+        public override SearchDepth SearchDepth => SearchDepth.Shallow;
 
         public override SearchResult<string> Search(string fileName, ref Hashtable hashtable, string startDir = "")
         {

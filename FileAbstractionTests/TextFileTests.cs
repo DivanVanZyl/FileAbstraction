@@ -2,7 +2,7 @@ using FileAbstraction;
 
 namespace FileAbstractionTests
 {
-    public class TextFiles
+    public class TextFileTests
     {
         [Fact]
         public void WriteObjectAsText()

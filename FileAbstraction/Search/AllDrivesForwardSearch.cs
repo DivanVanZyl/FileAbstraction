@@ -10,7 +10,7 @@ namespace FileAbstraction
 {
     internal class AllDrivesForwardSearch : FileSearch
     {
-        public new static SearchDepth SearchDepth => SearchDepth.Full;
+        public override SearchDepth SearchDepth => SearchDepth.Full;
 
         public override SearchResult<string> Search(string fileName, ref Hashtable hashtable, string startDir = "")
         {
@@ -21,7 +21,7 @@ namespace FileAbstraction
                 {
                     if (drive.IsReady)
                     {
-                        var result = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName,hashtable);
+                        var result = WalkDirectoryTree(new DirectoryInfo(drive.Name), fileName, hashtable);
                         if (result.IsSuccess)
                         {
                             return result;
@@ -55,10 +55,8 @@ namespace FileAbstraction
                 {
                     var specialFolders = Validation.IsWindows ? Enum.GetValues(typeof(Environment.SpecialFolder)).Cast<Environment.SpecialFolder>().Select(Environment.GetFolderPath).ToList() : Validation.LinuxSystemDrives;
                     // Resursive call for each subdirectory.
-                    if (!specialFolders.Contains(dirInfo.FullName))    //Skip system folders, they are large and the user file is probably not here.
-                    {
-                        WalkDirectoryTree(dirInfo, fileName, hashtable);
-                    }
+                    WalkDirectoryTree(dirInfo, fileName, hashtable);
+
                 }
             }
             catch (UnauthorizedAccessException ex)
