@@ -29,7 +29,6 @@ namespace FileAbstraction
             if (o is null)
             {
                 File.WriteAllBytes(path.Text, new byte[0]);
-                return;
             }
             else if (o.GetType() == typeof(byte[]))
             {
