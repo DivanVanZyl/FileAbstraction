@@ -49,14 +49,12 @@ namespace FileAbstraction
                     return result;
                 }
 
-
                 subDirs = root.GetDirectories();
                 foreach (DirectoryInfo dirInfo in subDirs)
                 {
                     var specialFolders = Validation.IsWindows ? Enum.GetValues(typeof(Environment.SpecialFolder)).Cast<Environment.SpecialFolder>().Select(Environment.GetFolderPath).ToList() : Validation.LinuxSystemDrives;
                     // Resursive call for each subdirectory.
                     WalkDirectoryTree(dirInfo, fileName, hashtable);
-
                 }
             }
             catch (UnauthorizedAccessException ex)

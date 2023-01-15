@@ -30,7 +30,7 @@ namespace FileAbstractionTests
             Assert.NotNull(result);
             Assert.Equal(content.ToString(), result);
         }
-
+        [Fact]
         public static void SearchDeepBackUserDirectoryTextFile()
         {
             var content = "This was found in my user folder";

@@ -18,21 +18,28 @@ namespace FileAbstraction
         }
         protected SearchResult<string> SearchSubDirectoryForFile(string directory, string fileName, ref Hashtable hashtable)
         {
-            if (hashtable.ContainsKey(directory))
+            try
             {
-                return new SearchResult<string>(new Exception("Already searched this directory: " + directory));                
-            }
-            else
-            {
-                foreach (var filePath in Directory.GetFiles(directory))
+                if (hashtable.ContainsKey(directory))
                 {
-                    var name = new FileName(filePath);
-                    if (name.Text == fileName)
-                    {
-                        return new SearchResult<string>(File.ReadAllText(filePath));
-                    }
+                    return new SearchResult<string>(new Exception("Already searched this directory: " + directory));                
                 }
-                hashtable.Add(directory, directory.GetHashCode());
+                else
+                {
+                    foreach (var filePath in Directory.GetFiles(directory))
+                    {
+                        var name = new FileName(filePath);
+                        if (name.Text == fileName)
+                        {
+                            return new SearchResult<string>(File.ReadAllText(filePath));
+                        }
+                    }
+                    hashtable.Add(directory, directory.GetHashCode());
+                }
+            }
+            catch (System.UnauthorizedAccessException e)
+            {
+                new SearchResult<string>(e);
             }
             return new SearchResult<string>(new FileNotFoundException());
         }
