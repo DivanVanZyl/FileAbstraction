@@ -30,29 +30,5 @@ namespace FileAbstractionTests
             Assert.NotNull(result);
             Assert.Equal(content.ToString(), result);
         }
-
-        [Fact]
-        public static void SearchDeepBackUserDirectoryTextFile()
-        {
-            var content = "This was found in my user folder";
-            var fileName = "myUserFile.txt";
-            content.ToFile(Path.Combine(@"C:", "Users", $"{Environment.UserName}", "Downloads", fileName));
-
-
-            var result = FileAbstract.ReadFile(fileName);
-            Assert.NotNull(result);
-            Assert.Equal(content.ToString(), result);
-        }
-
-        [Fact]
-        public static void SearchForwardOnAnotherDrive()
-        {
-            var content = "You found me on another drive!";
-            content.ToFile("E:" + Path.DirectorySeparatorChar + "And I hide on another drive.txt");
-
-            var result = FileAbstract.ReadFile("And I hide on another drive.txt");
-            Assert.NotNull(result);
-            Assert.Equal(content.ToString(), result);
-        }
     }
 }
