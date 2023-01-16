@@ -10,7 +10,7 @@ namespace FileAbstraction
 {
     internal class AllDrivesForwardSearch : FileSearch
     {
-        public override SearchDepth SearchDepth => SearchDepth.Full;
+        public override SearchDepth SearchDepth => SearchDepth.Deep;
 
         public override SearchResult<string> Search(string fileName, ref Hashtable hashtable, string startDir = "")
         {

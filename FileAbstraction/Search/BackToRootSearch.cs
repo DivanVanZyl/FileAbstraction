@@ -11,7 +11,7 @@ namespace FileAbstraction
 {
     internal class BackToRootSearch : FileSearch
     {
-        public override SearchDepth SearchDepth => SearchDepth.Deep;
+        public override SearchDepth SearchDepth => SearchDepth.Shallow;
 
         public override SearchResult<string> Search(string fileName, ref Hashtable hashtable, string startDir = "")
         {

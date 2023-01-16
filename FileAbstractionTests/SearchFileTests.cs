@@ -39,7 +39,7 @@ namespace FileAbstractionTests
             content.ToFile(Path.Combine(@"C:", "Users", $"{Environment.UserName}", "Downloads", fileName));
 
 
-            var result = FileAbstract.ReadFile(fileName, SearchDepth.Full);
+            var result = FileAbstract.ReadFile(fileName, SearchDepth.Deep);
             Assert.NotNull(result);
             Assert.Equal(content.ToString(), result);
         }
@@ -50,7 +50,7 @@ namespace FileAbstractionTests
             var content = "You found me on another drive!";
             content.ToFile("E:" + Path.DirectorySeparatorChar + "And I hide on another drive.txt");
 
-            var result = FileAbstract.ReadFile("And I hide on another drive.txt", SearchDepth.Full);
+            var result = FileAbstract.ReadFile("And I hide on another drive.txt", SearchDepth.Deep);
             Assert.NotNull(result);
             Assert.Equal(content.ToString(), result);
         }

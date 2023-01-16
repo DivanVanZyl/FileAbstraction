@@ -49,7 +49,6 @@ namespace FileAbstraction
     {
         None = 0,
         Shallow = 1,
-        Deep = 2,
-        Full = 3
+        Deep = 2
     }
 }
