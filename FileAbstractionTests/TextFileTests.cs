@@ -42,7 +42,7 @@ namespace FileAbstractionTests
             var content = "This was found in my user folder";
             var dir = Path.Combine(@"C:", "Users", $"{Environment.UserName}", "Downloads", "myFile.txt");
 
-            var result = FileAbstract.ReadFile(dir, SearchDepth.Deep);
+            var result = FileAbstract.ReadFile(dir);
             Assert.NotNull(result);
             Assert.Equal(content.ToString(), result);
         }

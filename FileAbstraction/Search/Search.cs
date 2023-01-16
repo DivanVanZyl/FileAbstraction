@@ -11,44 +11,39 @@ namespace FileAbstraction
 {
     internal static class Search
     {
-        internal static SearchResult<string> SearchRead(this DirectoryItem directoryItem, SearchDepth searchDepth)
+        internal static SearchResult<string> SearchRead(this DirectoryItem directoryItem)
         {
             var fileName = Validation.IsDirectory(directoryItem.Text)
                 ? GetFileName(directoryItem)
                 : directoryItem.Text;
 
-            Hashtable hashtable = new Hashtable(1000000,0.7f);
+            Hashtable hashtable = new Hashtable(1000000, 0.7f);
             List<FileSearch> searches = new List<FileSearch>
             {
                 new ForwardSearch(),
-                new BackToRootSearch(),
-                new AllDrivesForwardSearch()
+                new BackToRootSearch()
             };
 
 
             foreach (var search in searches)
             {
-                if (search.SearchDepth <= searchDepth)
+                var result = search.Search(fileName, ref hashtable, Directory.GetCurrentDirectory());
+                if (result.IsSuccess)
                 {
-                    var result = search.Search(fileName, ref hashtable, Directory.GetCurrentDirectory());
-                    if (result.IsSuccess)
-                    {
-                        return result;
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine(
-                            result.Exception is not null ?
-                            result.Exception.Message :
-                            search.ToString() + " did not find the file: " + fileName);
-
-                    }
+                    return result;
                 }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        result.Exception is not null ?
+                        result.Exception.Message :
+                        search.ToString() + " did not find the file: " + fileName);
+                }
+
             }
             return new SearchResult<string>(
                 new FileNotFoundException(
                     "File cannot be found with the " +
-                    searchDepth.ToString() +
                     " search."));
         }
 
