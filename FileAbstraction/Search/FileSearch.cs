@@ -10,12 +10,7 @@ namespace FileAbstraction
 {
     internal abstract class FileSearch
     {
-        public abstract SearchDepth SearchDepth { get; }
         public abstract SearchResult<string> Search(string fileName, ref Hashtable hashtable, string startDir = "");
-        public override string ToString()
-        {
-            return this.GetType().Name;
-        }
         protected SearchResult<string> SearchSubDirectoryForFile(string directory, string fileName, ref Hashtable hashtable)
         {
             try
@@ -43,12 +38,9 @@ namespace FileAbstraction
             }
             return new SearchResult<string>(new FileNotFoundException());
         }
-    }
-
-    public enum SearchDepth
-    {
-        None = 0,
-        Shallow = 1,
-        Deep = 2
+        public override string ToString()
+        {
+            return this.GetType().Name;
+        }
     }
 }

@@ -57,7 +57,7 @@ namespace FileAbstraction
             var file = new FileObject(fileName);
             return File.ReadAllText(file.Text);
         }
-        public static string ReadFile(string input, SearchDepth searchDepth = SearchDepth.Shallow)
+        public static string ReadFile(string input)
         {
             //Either name or path are acceptable inputs.
             if (Validation.IsDirectory(input))
@@ -69,7 +69,7 @@ namespace FileAbstraction
                 }
                 catch
                 {
-                    var data = path.SearchRead(searchDepth).Data;
+                    var data = path.SearchRead().Data;
                     return data is null ? "" : data;
 
                 }
@@ -80,11 +80,11 @@ namespace FileAbstraction
                 var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
                 var match = allFiles.FirstOrDefault(x => x.Contains(name.Text));
 
-                var data = match is not null ? File.ReadAllText(match) : name.SearchRead(searchDepth).Data;
+                var data = match is not null ? File.ReadAllText(match) : name.SearchRead().Data;
                 return data is null ? "" : data;
             }
         }
         public static void DisplayFile() => Console.WriteLine(ReadFile());
-        public static void DisplayFile(string input, SearchDepth depth = SearchDepth.Shallow) => Console.WriteLine(ReadFile(input, depth));
+        public static void DisplayFile(string input) => Console.WriteLine(ReadFile(input));
     }
 }
