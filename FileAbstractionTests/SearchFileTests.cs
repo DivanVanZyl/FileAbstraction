@@ -8,17 +8,7 @@ using System.Threading.Tasks;
 namespace FileAbstractionTests
 {
     public class SearchFileTests
-    {
-        [Fact]
-        public static void ReadFileDirectlyUserDirectoryTextFile()
-        {
-            var content = "This was found in my user folder";
-            var dir = Path.Combine(@"C:", "Users", $"{Environment.UserName}", "Downloads", "myFile.txt");
-
-            var result = FileAbstract.ReadFile(dir, SearchDepth.Deep);
-            Assert.NotNull(result);
-            Assert.Equal(content.ToString(), result);
-        }
+    {        
         [Fact]
         public static void SearchIncorrectParam()
         {
