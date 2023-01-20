@@ -34,9 +34,7 @@ namespace FileAbstraction.Data
         {
             return o is string
                 || o is string[]
-                || o is char
-                || o is List<string>
-                || o is List<char>;
+                || o is char;
         }
     }
 }

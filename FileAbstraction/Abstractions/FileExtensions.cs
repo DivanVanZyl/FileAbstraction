@@ -30,19 +30,7 @@ namespace FileAbstraction
             {
                 File.WriteAllBytes(path.Text, new byte[0]);
             }
-            else if (o.GetType() == typeof(byte[]))
-            {
-                var bytes = (byte[])Convert.ChangeType(o, typeof(T));
-                File.WriteAllBytes(path.Text, bytes);
-            }
-            else
-            {
-                WriteToFile(o, path);
-            }
-        }
-        private static void WriteToFile<T>(T o, FilePath path)
-        {
-            if (Validation.IsTextType(o))
+            else if (Validation.IsTextType(o))
             {
                 try
                 {
