@@ -10,11 +10,6 @@ namespace FileAbstraction.Data
     {
         public static byte[] ObjectToByteArray<T>(this T o)
         {
-            if (o is null)
-            {
-                return Array.Empty<byte>();
-            }
-
             return Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(o, GetJsonSerializerOptions()));
         }
         private static JsonSerializerOptions GetJsonSerializerOptions()
