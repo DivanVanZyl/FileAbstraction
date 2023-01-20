@@ -28,10 +28,10 @@ namespace FileAbstractionTests
         public void ReadFileAsByteArray()
         {
             string text = "This is a test.";
-            byte[] bytes = Encoding.ASCII.GetBytes(text);
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
             bytes.ToFile();
             var savedBytes = FileAbstract.ReadBinFile();
-            Assert.Equal(text, Encoding.ASCII.GetString(savedBytes));
+            Assert.Equal(Encoding.UTF8.GetString( bytes), Encoding.UTF8.GetString(savedBytes));
         }
 
         [Fact]
