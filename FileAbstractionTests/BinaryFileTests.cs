@@ -53,6 +53,23 @@ namespace FileAbstractionTests
             Assert.NotNull(savedC);
             Assert.Equal(p.Name, savedC.Name);
         }
+
+        [Fact]
+        public void ListOfObjects()
+        {
+            var list = new List<string>
+{
+    "This",
+    "is",
+    "a",
+    "collection"
+};
+
+            list.ToFile();
+            var savedList = FileAbstract.ReadBinFile<List<string>>();
+            Assert.NotNull(savedList);
+            Assert.Equal(list, savedList);
+        }
     }
 
     internal class Computer
@@ -71,7 +88,7 @@ namespace FileAbstractionTests
         public string Name { get; }
         public Person(string name)
         {
-            Name= name;
+            Name = name;
         }
     }
 }
