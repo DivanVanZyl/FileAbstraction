@@ -16,13 +16,13 @@ namespace FileAbstraction
             FilePath path = new FilePath(inputPath);
             if (path.Text == "")
             {
-                path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{Environment.UserName}");
+                path = new FilePath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + $"{Environment.UserName}");
             }
             else
             {
                 if (!Validation.IsDirectory(path.Text))
                 {
-                    path = new FilePath(AppDomain.CurrentDomain.BaseDirectory + $"{new FileName(path.Text).Text}");
+                    path = new FilePath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + $"{new FileName(path.Text).Text}");
                 }
             }
 
@@ -38,7 +38,7 @@ namespace FileAbstraction
                 }
                 catch (DirectoryNotFoundException)
                 {
-                    File.WriteAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + Path.GetFileName(path.Text), o.ToString());
+                    File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Path.DirectorySeparatorChar + Path.GetFileName(path.Text), o.ToString());
                 }
             }
             else

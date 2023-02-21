@@ -9,7 +9,7 @@ namespace FileAbstraction
     {
         public static T? ReadBinFile<T>(string path = "")
         {
-            var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
+            var allFiles = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             var latestFile = allFiles.Max(File.GetLastWriteTime);
             if(path == "")
             {
@@ -25,7 +25,7 @@ namespace FileAbstraction
         }
         public static byte[] ReadBinFile(string path = "")
         {
-            var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
+            var allFiles = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             var latestFile = allFiles.Max(File.GetLastWriteTime);
             if (path == "")
             {
@@ -50,7 +50,7 @@ namespace FileAbstraction
         }
         public static string ReadFile()
         {
-            var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
+            var allFiles = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             var latestFile = allFiles.Max(File.GetLastWriteTime);
             var fileName = allFiles.Single(x => File.GetLastWriteTime(x) == latestFile);
 
@@ -77,7 +77,7 @@ namespace FileAbstraction
             else
             {
                 var name = new FileName(input);
-                var allFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
+                var allFiles = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
                 var match = allFiles.FirstOrDefault(x => x.Contains(name.Text));
 
                 var data = match is not null ? File.ReadAllText(match) : name.SearchRead().Data;
