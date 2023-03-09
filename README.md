@@ -1,3 +1,4 @@
+![Nuget](https://img.shields.io/nuget/v/Util.File.Abstraction?style=flat-square)
 # FileAbstraction
 
 For shortened file IO syntax. 
