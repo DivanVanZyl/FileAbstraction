@@ -42,6 +42,7 @@ namespace FileAbstractionTests
             var content = "This was found in my user folder";
             var dir = Path.Combine(@"C:", "Users", $"{Environment.UserName}", "Downloads", "myFile.txt");
 
+            content.ToFile(inputPath: dir);
             var result = FileAbstract.ReadFile(dir);
             Assert.NotNull(result);
             Assert.Equal(content.ToString(), result);
