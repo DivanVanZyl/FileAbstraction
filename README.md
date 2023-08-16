@@ -7,7 +7,11 @@ This is an easy way of writing/reading files. This might be useful for state man
 
 For example, you can save files to the current directory with the syntax: `someObject.ToFile();`
 
-For example: `256.ToFile();` This will write the number 256 to a file.
+![EarlNotBadGIF](https://github.com/DivanVanZyl/FileAbstraction/assets/5897077/6688498d-412f-4b79-a4cf-d18247dac653)
+
+For example: `256.ToFile();` This will write the number 256 to a file!
+
+![ShooktShockedGIF](https://github.com/DivanVanZyl/FileAbstraction/assets/5897077/887e2a35-3110-4d36-8a21-1ee979ead0cb)
 
 Then, you can display the file with `FileAbstract.DisplayFile();`
 
